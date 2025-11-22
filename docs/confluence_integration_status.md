@@ -17,10 +17,11 @@ Confluence documentation has been integrated into the **PhoenixExpert** agent sy
   - Provide Q&A based on indexed knowledge from code and Confluence
 
 ### Confluence Access
-- **Base URL**: https://asterbit.atlassian.net/wiki/home
+- **Base URL**: Set via `CONFLUENCE_URL` environment variable (default: read from cache only)
 - **Mode**: Read-only (never creates, edits, or deletes)
 - **Cache Location**: `confluence_cache/`
 - **Integration**: Automatic, no approval required
+- **Configuration**: Set `CONFLUENCE_URL` environment variable (e.g., `https://your-company.atlassian.net/wiki/home`)
 
 ## Rules Enforced
 

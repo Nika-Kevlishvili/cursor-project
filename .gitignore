@@ -4,6 +4,8 @@ migration/environment_variables_export.ps1
 .env
 .env.local
 *.env
+# But keep .env.example
+!.env.example
 
 # Python
 venv/

@@ -191,11 +191,56 @@ function New-EnvExample {
 # Copy this file to .env and fill in your values
 # DO NOT commit .env to Git!
 
+# ============================================
+# Environment Variables Setup
+# ============================================
+Write-Host ""
+Write-Host "Setting up Environment Variables..." -ForegroundColor Yellow
+
+# Check if .env.example exists
+if (Test-Path ".env.example") {
+    if (-not (Test-Path ".env")) {
+        Write-Host "Creating .env file from template..." -ForegroundColor Cyan
+        Copy-Item ".env.example" ".env" -Force
+        Write-Host "✓ .env file created" -ForegroundColor Green
+        Write-Host "⚠️  IMPORTANT: Edit .env file and fill in your actual values!" -ForegroundColor Yellow
+        Write-Host "   Run: .\setup_environment.ps1 -Interactive" -ForegroundColor Gray
+    } else {
+        Write-Host "✓ .env file already exists" -ForegroundColor Green
+    }
+} else {
+    Write-Host "⚠️  .env.example not found. Creating basic template..." -ForegroundColor Yellow
+    @"
 # GitLab Configuration
 GITLAB_URL=https://gitlab.com
 GITLAB_TOKEN=your-gitlab-token
 GITLAB_PROJECT_ID=12345678
 GITLAB_PIPELINE_ID=123456
+
+# Jira Configuration
+JIRA_URL=https://your-company.atlassian.net
+JIRA_EMAIL=your-email@example.com
+JIRA_API_TOKEN=your-jira-api-token
+JIRA_PROJECT_KEY=PROJ
+
+# Postman Configuration
+POSTMAN_API_KEY=your-postman-api-key
+POSTMAN_WORKSPACE_ID=your-workspace-id
+
+# Confluence Configuration
+CONFLUENCE_URL=https://your-company.atlassian.net/wiki/home
+"@ | Out-File -FilePath ".env.example" -Encoding UTF8
+    if (-not (Test-Path ".env")) {
+        Copy-Item ".env.example" ".env" -Force
+    }
+}
+
+Write-Host ""
+Write-Host "📝 Environment Variables:" -ForegroundColor Cyan
+Write-Host "  - Edit .env file with your actual credentials" -ForegroundColor White
+Write-Host "  - Or run: .\setup_environment.ps1 -Interactive" -ForegroundColor White
+Write-Host "  - Then load: .\load_environment.ps1" -ForegroundColor White
+Write-Host ""
 
 # Jira Configuration
 JIRA_URL=https://your-company.atlassian.net

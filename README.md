@@ -18,6 +18,22 @@ Multi-functional project with Python agents, Java/Gradle libraries, Postman inte
 
 ## 🚀 სწრაფი დაწყება / Quick Start
 
+### ⚙️ Environment Variables Setup (მნიშვნელოვანი!)
+
+**ახალ კომპიუტერზე ან GitHub-დან clone-ის შემდეგ:**
+
+```powershell
+# 1. Create .env file from template
+.\setup_environment.ps1 -Interactive
+
+# 2. Load environment variables
+.\load_environment.ps1
+```
+
+დეტალური ინფორმაციისთვის იხილეთ [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)
+
+For detailed information see [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)
+
 ### მიგრაცია / Migration
 
 დეტალური ინფორმაციისთვის იხილეთ [migration/README.md](migration/README.md)
@@ -59,13 +75,19 @@ cd phoenix-core-lib
 
 ## ⚠️ მნიშვნელოვანი შენიშვნები / Important Notes
 
-1. **Environment Variables**: არ დაკომიტოთ sensitive data Git-ში
-   - Do not commit sensitive data to Git
-   - გამოიყენეთ `.gitignore` / Use `.gitignore`
+1. **Environment Variables** (კრიტიკული!):
+   - ახალ კომპიუტერზე **უნდა** დააყენოთ environment variables
+   - On new computer you **MUST** set up environment variables
+   - გამოიყენეთ `.\setup_environment.ps1` და `.\load_environment.ps1`
+   - Use `.\setup_environment.ps1` and `.\load_environment.ps1`
+   - იხილეთ [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md) დეტალებისთვის
+   - See [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md) for details
 
 2. **Secrets**: 
    - API keys, tokens, passwords უნდა იყოს environment variables-ში
    - API keys, tokens, passwords should be in environment variables
+   - არ დაკომიტოთ `.env` ფაილი Git-ში
+   - Do NOT commit `.env` file to Git
 
 3. **Migration**: 
    - გამოიყენეთ `migration/` დირექტორია setup-ისთვის
