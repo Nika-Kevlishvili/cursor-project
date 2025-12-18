@@ -1,0 +1,136 @@
+---
+alwaysApply: true
+---
+
+# DATABASE WORKFLOW RULES [CRITICAL - MANDATORY]
+
+## Rule DB.1: PostgreSQL MCP Connection for Test Environment [CRITICAL]
+
+**MANDATORY workflow for ALL database queries in Test environment:**
+
+### Connection Process:
+1. **ALWAYS use PostgreSQLTest MCP server** for Test environment database access
+2. **Connection details:**
+   - Host: `10.236.20.24`
+   - Port: `5432`
+   - Database: `phoenix`
+   - User: `postgres`
+   - Password: `U&Vd2Ge@nyM1`
+
+3. **Connection steps:**
+   ```python
+   # Step 1: Connect to database
+   mcp_PostgreSQLTest_connect_db(
+       host="10.236.20.24",
+       port=5432,
+       user="postgres",
+       password="U&Vd2Ge@nyM1",
+       database="phoenix"
+   )
+   
+   # Step 2: Execute queries
+   mcp_PostgreSQLTest_query(sql="SELECT ...")
+   ```
+
+### Query Execution:
+- **ALWAYS connect first** using `mcp_PostgreSQLTest_connect_db()` before executing queries
+- Use `mcp_PostgreSQLTest_query()` for SELECT queries
+- Use `mcp_PostgreSQLTest_execute()` for INSERT/UPDATE/DELETE operations (if needed)
+- Connection persists for the session, but reconnect if connection errors occur
+
+### Available MCP Servers:
+- **PostgreSQLTest** - Test environment (10.236.20.24:5432/phoenix)
+- **PostgreSQLDev** - Dev environment
+- **PostgreSQLDev2** - Dev2 environment  
+- **PostgreSQLPreProd** - PreProd environment
+
+**For Test environment, ALWAYS use PostgreSQLTest MCP server.**
+
+## Rule DB.2: Standard Query Patterns [IMPORTANT]
+
+### Finding Contracts by POD Identifier:
+
+**Product Contracts:**
+```sql
+SELECT DISTINCT
+    'PRODUCT_CONTRACT' as contract_type,
+    c.id as contract_id,
+    c.contract_number,
+    c.status,
+    c.contract_status,
+    c.create_date,
+    c.entry_into_force_date,
+    c.termination_date,
+    p.identifier as pod_identifier,
+    cp.id as contract_pod_id,
+    cp.activation_date,
+    cp.deactivation_date,
+    cp.status as contract_pod_status
+FROM product_contract.contracts c
+JOIN product_contract.contract_details cd ON cd.contract_id = c.id
+JOIN product_contract.contract_pods cp ON cp.contract_detail_id = cd.id
+JOIN pod.pod_details pd ON cp.pod_detail_id = pd.id
+JOIN pod.pod p ON pd.pod_id = p.id
+WHERE p.identifier = 'POD_IDENTIFIER_HERE'
+ORDER BY c.contract_number, c.id
+```
+
+**Service Contracts:**
+```sql
+SELECT DISTINCT
+    'SERVICE_CONTRACT' as contract_type,
+    c.id as contract_id,
+    c.contract_number,
+    c.status,
+    c.contract_status,
+    c.create_date,
+    c.entry_into_force_date,
+    c.termination_date,
+    p.identifier as pod_identifier,
+    cp.id as contract_pod_id,
+    cp.status as contract_pod_status
+FROM service_contract.contracts c
+JOIN service_contract.contract_details cd ON cd.contract_id = c.id
+JOIN service_contract.contract_pods cp ON cp.contract_detail_id = cd.id
+JOIN pod.pod p ON cp.pod_id = p.id
+WHERE p.identifier = 'POD_IDENTIFIER_HERE'
+ORDER BY c.contract_number, c.id
+```
+
+### Key Schema Relationships:
+- **Product Contracts:** `contracts` → `contract_details` → `contract_pods` → `pod_details` → `pod`
+- **Service Contracts:** `contracts` → `contract_details` → `contract_pods` → `pod` (direct pod_id)
+- **POD Identifier:** Stored in `pod.pod.identifier` (varchar(33))
+
+## Rule DB.3: Query Best Practices [IMPORTANT]
+
+1. **Always use DISTINCT** when joining multiple tables to avoid duplicate rows
+2. **Include contract_type** in results to distinguish Product vs Service contracts
+3. **Order results** by contract_number and contract_id for consistency
+4. **Include relevant dates** (create_date, entry_into_force_date, termination_date, activation_date, deactivation_date)
+5. **Include status fields** (contract status, contract_pod status) for context
+
+## Rule DB.4: Error Handling [IMPORTANT]
+
+- If connection fails, verify credentials and network access
+- If query fails, check SQL syntax and table/schema names
+- Always handle empty result sets gracefully
+- Log errors with full context for debugging
+
+## Rule DB.5: Security [CRITICAL]
+
+- **NEVER commit database credentials** to version control
+- **NEVER log passwords** in responses or reports
+- Use MCP environment variables for credentials when possible
+- Credentials are stored in MCP configuration, not in code
+
+## Rule DB.6: Workflow Integration [IMPORTANT]
+
+When database queries are needed:
+1. Connect using PostgreSQLTest MCP (Rule DB.1)
+2. Execute queries using standard patterns (Rule DB.2)
+3. Format results clearly for user
+4. Include all relevant contract and POD information
+5. Follow reporting rules (Rule 0.6) if task involves database queries
+
+**Violation of database workflow rules is a CRITICAL SYSTEM ERROR.**

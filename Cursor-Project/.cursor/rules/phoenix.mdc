@@ -1,0 +1,77 @@
+---
+alwaysApply: true
+---
+
+# PHOENIX PROJECT RULES - MAIN INDEX
+
+This file serves as the main index for all Phoenix project rules. All rules are organized by topic in separate files for better maintainability.
+
+## 📋 Rules Organization
+
+All rules are organized into the following thematic files:
+
+1. **core_rules.mdc** - Most critical rules with absolute priority (Rule 0.x)
+   - Rules reading before any action
+   - Agents involved disclosure
+   - PhoenixExpert routing
+   - IntegrationService requirements
+   - Report generation
+
+2. **agent_rules.mdc** - Agent-specific rules and collaboration patterns
+   - PhoenixExpert authority
+   - Agent routing and selection
+   - Multi-agent collaboration
+   - Agent organization structure
+   - Consultation requirements
+
+3. **safety_rules.mdc** - Security and safety rules
+   - Read-only operations (GitLab, Confluence)
+   - Source-of-truth priorities
+   - Error handling
+   - Negative rules (what must never happen)
+   - Security prohibitions
+
+4. **file_organization_rules.mdc** - File organization and structure rules
+   - Directory structure requirements
+   - File placement rules
+   - User story location requirements
+   - Report organization
+
+5. **workflow_rules.mdc** - Workflow and process rules
+   - Bug validation workflow
+   - Database workflow
+   - Response requirements
+
+6. **database_workflow.mdc** - Database-specific workflow rules
+   - PostgreSQLTest connection
+   - Query patterns
+   - Best practices
+
+## 🔄 Rules Loading
+
+All rules with `alwaysApply: true` are automatically loaded and applied. The rules loader reads ALL `.mdc` files from `.cursor/rules/` directory.
+
+**Important:** Rule 0.0 requires that ALL rules be read BEFORE any action is taken.
+
+## 📝 Quick Reference
+
+- **Absolute Priority Rules:** See `core_rules.mdc` (Rule 0.x)
+- **Agent Behavior:** See `agent_rules.mdc`
+- **Security:** See `safety_rules.mdc`
+- **File Organization:** See `file_organization_rules.mdc`
+- **Workflows:** See `workflow_rules.mdc` and `database_workflow.mdc`
+
+## ⚠️ CRITICAL REMINDERS
+
+1. **Rule 0.0:** ALWAYS read all rules before any action
+2. **Rule 0.1:** ALWAYS end responses with "Agents involved: [names]"
+3. **Rule 0.2:** ALL Phoenix questions → PhoenixExpert ONLY
+4. **Rule 0.6:** ALWAYS generate reports after tasks
+5. **Rule 1:** GitLab and Confluence are READ-ONLY
+6. **Rule 8:** ALWAYS consult PhoenixExpert before tasks
+7. **Rule 11:** ALWAYS call IntegrationService.update_before_task()
+8. **Rule 34:** ALL agents MUST be organized in subdirectories
+
+---
+
+**Note:** This index file maintains backward compatibility. All rules are still accessible through their respective files, and the rules loader reads all `.mdc` files automatically.

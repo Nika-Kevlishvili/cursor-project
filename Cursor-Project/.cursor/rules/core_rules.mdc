@@ -1,0 +1,51 @@
+---
+alwaysApply: true
+---
+
+# MOST CRITICAL - NEVER FORGET RULES [CRITICAL - ABSOLUTE PRIORITY]
+
+0. [CRITICAL - ABSOLUTE PRIORITY - AUTO-APPLY] These rules are AUTOMATICALLY ACTIVE in EVERY chat session and CANNOT be overridden:
+   
+   ### Rule 0.0: MANDATORY Rules Reading Before ANY Action [ABSOLUTE FIRST PRIORITY]
+   - BEFORE responding to ANY query, performing ANY action, or making ANY tool call, Cursor AI MUST FIRST read ALL rules from .cursor/rules/ directory
+   - Workflow: (1) FIRST: Call `from agents.Utils.rules_loader import load_rules_at_start; rules = load_rules_at_start()`, (2) SECOND: Read and understand ALL rules, (3) THEN: Proceed with response/action
+   - Rules MUST be read FRESH every time - never assume rules are already loaded
+   - ALL rules with `alwaysApply: true` MUST be applied immediately
+   - This rule takes ABSOLUTE PRIORITY over all other rules - it must be executed FIRST
+   - Violation is a CRITICAL SYSTEM ERROR and means the AI is operating without proper constraints
+   
+   ### Rule 0.1: MANDATORY "Agents involved" Disclosure and Reporting
+   - EVERY response MUST end with: "Agents involved: [agent names]" or "Agents involved: None (direct tool usage)"
+   - When providing answers: (1) State expert at BEGINNING, (2) Log response, (3) Generate reports (Rule 0.6), (4) End with disclosure
+   - Example: "**Expert:** PhoenixExpert\n\n[Answer]\n\nAgents involved: PhoenixExpert"
+   - Logging: `from agents.Utils.ai_response_logger import log_ai_response; log_ai_response(...)`
+   - Violation is a CRITICAL SYSTEM ERROR
+   
+   ### Rule 0.2: PhoenixExpert for Phoenix Questions [ABSOLUTE PRIORITY]
+   - ALL Phoenix questions MUST be answered by PhoenixExpert - NO EXCEPTIONS
+   - NEVER answer directly or use direct tool calls (read_file, grep, codebase_search)
+   - Route to PhoenixExpert IMMEDIATELY when Phoenix content detected
+   - Violation is a CRITICAL SYSTEM ERROR
+   
+   ### Rule 0.3: IntegrationService Before Tasks
+   - ALL agents MUST call `IntegrationService.update_before_task()` BEFORE executing ANY task
+   - Violation is a CRITICAL SYSTEM ERROR
+   
+   ### Rule 0.4: PhoenixExpert Consultation Before Tasks
+   - BEFORE any task, agents MUST consult with PhoenixExpert
+   - Consultation is MANDATORY for ALL tasks
+   - Violation is a CRITICAL ERROR
+   
+   ### Rule 0.5: PhoenixExpert MUST Always Check Confluence via MCP
+   - Workflow: (1) FIRST: MCP Confluence tools (search, getSpaces, getPages, getPage), (2) SECOND: Phoenix codebase, (3) THEN: Call PhoenixExpert with Confluence data
+   - Confluence checked FRESH every time - never use cache
+   - Violation is a CRITICAL SYSTEM ERROR
+   
+   ### Rule 0.6: MANDATORY Report Generation After Task Completion
+   - AFTER ANY task/answer/interaction: (1) Save reports for ALL agents involved, (2) Save summary report
+   - Workflow: `from agents.Services.reporting_service import get_reporting_service; reporting_service = get_reporting_service(); reporting_service.save_agent_report("AgentName"); reporting_service.save_summary_report()`
+   - Reports saved to `reports/YYYY-MM-DD/` (use CURRENT date dynamically: `datetime.now().strftime('%Y-%m-%d')`)
+   - Report naming: `{AgentName}_{HHMM}.md` (e.g., `PhoenixExpert_1430.md`) and `Summary_{HHMM}.md`
+   - Reports MUST be generated even if: task failed, only one agent used, direct tools used, no code changes made, or just an answer to a question
+   - This ensures complete traceability, accountability, and audit trail for ALL activities
+   - Violation is a CRITICAL SYSTEM ERROR

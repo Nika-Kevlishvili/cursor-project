@@ -1,0 +1,65 @@
+---
+alwaysApply: true
+---
+
+# WORKFLOW RULES [CRITICAL]
+
+3. [CRITICAL] Every response MUST end with "Agents involved: [agent names]" or "Agents involved: None (direct tool usage)".
+   - Ensures transparency, accountability, and traceability.
+   - Violation is a CRITICAL ERROR.
+
+# BUG VALIDATION RULE [CRITICAL]
+
+32. [CRITICAL] When analyzing bug reports or bug validation requests, ALWAYS follow this mandatory workflow:
+    
+    **Step 1: Validate Bug Report Against Confluence**
+    - FIRST: Search Confluence using MCP tools (search(), searchConfluenceUsingCql(), getConfluencePage()) for related documentation
+    - Check if bug description matches Confluence documentation
+    - Verify if bug report contains correct information based on Confluence sources
+    - Report findings: "Confluence validation: [correct/incorrect/partially correct] - [explanation]"
+    
+    **Step 2: Validate Code Against Bug Report**
+    - SECOND: Search codebase using codebase_search() and grep() to find relevant code
+    - Analyze code implementation to verify if it satisfies the bug report requirements
+    - Check if code behavior matches expected behavior described in bug report
+    - Report findings: "Code validation: [satisfies/does not satisfy] the bug report - [explanation]"
+    
+    **Step 3: Provide Comprehensive Analysis**
+    - Combine Confluence findings and code analysis
+    - Provide clear answer about:
+      1. Whether bug report information is correct based on Confluence
+      2. Whether code satisfies the bug report case or not
+    - Include specific code references and line numbers when relevant
+    - Use clear structure: "1. Bug Report Accuracy", "2. Code Analysis", "3. Conclusion"
+    
+    **Workflow Requirements:**
+    - ALWAYS check Confluence FIRST (via MCP tools)
+    - ALWAYS check codebase SECOND
+    - ALWAYS provide both validations in response
+    - NEVER skip either step
+    - Use READ-ONLY mode (no code modifications unless explicitly requested)
+    
+    **Example Response Structure:**
+    ```
+    ## Bug Validation Analysis
+    
+    ### 1. Confluence Validation
+    [Findings from Confluence search]
+    
+    ### 2. Code Analysis
+    [Findings from codebase analysis]
+    
+    ### 3. Conclusion
+    [Summary of both validations]
+    ```
+    
+    Violation is a CRITICAL SYSTEM ERROR.
+
+# DATABASE WORKFLOW RULE [CRITICAL]
+
+33. [CRITICAL] ALL database queries in Test environment MUST use PostgreSQLTest MCP server.
+    - Connection: Use `mcp_PostgreSQLTest_connect_db()` with credentials (host: 10.236.20.24, port: 5432, database: phoenix, user: postgres)
+    - Queries: Use `mcp_PostgreSQLTest_query()` for SELECT operations
+    - See `.cursor/rules/database_workflow.mdc` for complete workflow, query patterns, and best practices
+    - ALWAYS connect before executing queries
+    - Violation is a CRITICAL SYSTEM ERROR.

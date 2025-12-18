@@ -1,0 +1,47 @@
+---
+alwaysApply: true
+---
+
+# FILE ORGANIZATION RULES [CRITICAL - ABSOLUTE REQUIREMENT]
+
+31. [CRITICAL] ALL new files MUST be automatically organized into appropriate directories:
+    
+    **Directory Structure:**
+    - `agents/` - Agent files (.py with agent classes, services, utilities)
+    - `examples/` - Example scripts and utility scripts (.py for demos/testing)
+    - `config/` - Configuration files (.json, .yaml, .properties, specs)
+    - `docs/` - Documentation files (.md, .txt, .rst)
+    - `User story/` - User stories, flows, and related documentation files (.txt, .drawio, .md) - **MANDATORY location for ALL story/flow files** (located at project root)
+    - `reports/YYYY-MM-DD/` - Report files (.md) - **ALWAYS use CURRENT date dynamically**
+    - `postman/` - Postman collections and related files
+    - `Phoenix/` - Phoenix Java project files
+    
+    **Process:**
+    1. Identify file type and match to directory
+    2. Place in correct directory (create subdirectories if needed)
+    3. For reports: ALWAYS use TODAY's date folder (`datetime.now().strftime('%Y-%m-%d')`)
+    4. Use descriptive names following existing patterns
+    
+    **Special Rule for Stories and Flows:**
+    - When user requests creation of a story or flow file, it MUST be saved in `User story/` directory (at project root)
+    - This applies to: user stories, flow diagrams, story documentation, flow documentation
+    - File types: .txt, .drawio, .md, or any format related to stories/flows
+    - Examples: user story files, flow diagrams, story documentation, detailed flows
+    
+    **CRITICAL: User Stories MUST be written in English:**
+    - ALL user stories, acceptance criteria, business rules, and technical documentation within story files MUST be written in English
+    - This applies to ALL story files in `User story/` directory
+    - Only code examples, file paths, and technical identifiers may contain non-English text
+    - Violation is a CRITICAL SYSTEM ERROR
+    
+    **Examples:**
+    - ✅ `agents/custom_agent.py` (NOT in root)
+    - ✅ `examples/demo_script.py` (NOT in root)
+    - ✅ `reports/2025-12-10/AgentReport.md` (use CURRENT date)
+    - ✅ `User story/MY_USER_STORY.txt` (story files MUST go here)
+    - ✅ `User story/MY_FLOW_DIAGRAM.drawio` (flow files MUST go here)
+    - ❌ `custom_agent.py` in root → Should be `agents/custom_agent.py`
+    - ❌ `MY_STORY.txt` in docs root → Should be `User story/MY_STORY.txt`
+    - ❌ `MY_STORY.txt` in root → Should be `User story/MY_STORY.txt`
+    
+    Violation is a CRITICAL SYSTEM ERROR.
