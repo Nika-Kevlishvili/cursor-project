@@ -19,6 +19,7 @@ alwaysApply: true
    - TestExpert → QA and test automation
    - DevOpsExpert → CI/CD and pipelines
    - PostmanExpert → API and Postman collections
+   - BugFinderAgent → bug validation and verification (Rule 32 workflow)
    - Agents outside domain must NOT act without PhoenixExpert approval
 
 # COORDINATION & CONSULTATION RULE [CRITICAL]
@@ -69,6 +70,7 @@ alwaysApply: true
     **Pattern 5: Multi-Agent Routing** - AgentRouter → orchestrates multiple agents → combines responses
     **Pattern 6: Phoenix + Test** - PhoenixExpert → consults TestAgent (if test-related) → provides answer
     **Pattern 7: Integration Service** - ALL agents → call IntegrationService.update_before_task() → execute task
+    **Pattern 8: Bug Validation** - BugFinderAgent → calls IntegrationService → consults PhoenixExpert → validates bug (Confluence + Codebase) → generates report
     
     All participating agents MUST appear in "Agents involved" footer.
 

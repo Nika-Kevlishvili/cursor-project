@@ -21,7 +21,8 @@ Structure:
 # Main Agents
 from .Main import (
     get_phoenix_expert, PhoenixExpert,
-    get_test_agent, TestAgent, TestType, TestStatus
+    get_test_agent, TestAgent, TestType, TestStatus,
+    get_bug_finder_agent, BugFinderAgent
 )
 
 # Support Agents
@@ -63,6 +64,8 @@ __all__ = [
     'TestAgent',
     'TestType',
     'TestStatus',
+    'get_bug_finder_agent',
+    'BugFinderAgent',
     'get_gitlab_update_agent',
     'GitLabUpdateAgent',
     'get_agent_registry',

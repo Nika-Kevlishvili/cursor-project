@@ -10,10 +10,18 @@ alwaysApply: true
 
 # BUG VALIDATION RULE [CRITICAL]
 
-32. [CRITICAL] When analyzing bug reports or bug validation requests, ALWAYS follow this mandatory workflow:
+32. [CRITICAL] When analyzing bug reports or bug validation requests, ALWAYS use BugFinderAgent and follow this mandatory workflow:
+    
+    **MANDATORY: Use BugFinderAgent**
+    - ALL bug validation requests MUST be handled by BugFinderAgent
+    - Use: `from agents.Main import get_bug_finder_agent; bug_finder = get_bug_finder_agent(); result = bug_finder.validate_bug(bug_description)`
+    - BugFinderAgent automatically follows Rule 32 workflow and integrates with all required services
+    - This ensures consistent, structured bug validation with proper reporting
+    
+    **BugFinderAgent Workflow (Rule 32):**
     
     **Step 1: Validate Bug Report Against Confluence**
-    - FIRST: Search Confluence using MCP tools (search(), searchConfluenceUsingCql(), getConfluencePage()) for related documentation
+    - FIRST: Search Confluence using MCP tools (mcp_Confluence_search(), mcp_Confluence_searchConfluenceUsingCql(), mcp_Confluence_getConfluencePage()) for related documentation
     - Check if bug description matches Confluence documentation
     - Verify if bug report contains correct information based on Confluence sources
     - Report findings: "Confluence validation: [correct/incorrect/partially correct] - [explanation]"
@@ -31,13 +39,29 @@ alwaysApply: true
       2. Whether code satisfies the bug report case or not
     - Include specific code references and line numbers when relevant
     - Use clear structure: "1. Bug Report Accuracy", "2. Code Analysis", "3. Conclusion"
+    - Format report using: `bug_finder.format_validation_report(result)`
     
     **Workflow Requirements:**
+    - ALWAYS use BugFinderAgent for bug validation
     - ALWAYS check Confluence FIRST (via MCP tools)
     - ALWAYS check codebase SECOND
     - ALWAYS provide both validations in response
     - NEVER skip either step
     - Use READ-ONLY mode (no code modifications unless explicitly requested)
+    - BugFinderAgent automatically handles: IntegrationService calls, PhoenixExpert consultation, and report generation
+    
+    **Example Usage:**
+    ```python
+    from agents.Main import get_bug_finder_agent
+    
+    bug_finder = get_bug_finder_agent()
+    result = bug_finder.validate_bug("Bug description here")
+    
+    # Perform actual validation using MCP tools and codebase search
+    # Then populate result with findings
+    
+    report = bug_finder.format_validation_report(result)
+    ```
     
     **Example Response Structure:**
     ```
@@ -52,6 +76,13 @@ alwaysApply: true
     ### 3. Conclusion
     [Summary of both validations]
     ```
+    
+    **Why BugFinderAgent:**
+    - Ensures consistent bug validation workflow
+    - Automatically integrates with all required services (IntegrationService, ReportingService)
+    - Provides structured validation results
+    - Generates proper reports following Rule 0.6
+    - Follows all critical rules (0.3, 0.4, 0.6)
     
     Violation is a CRITICAL SYSTEM ERROR.
 
