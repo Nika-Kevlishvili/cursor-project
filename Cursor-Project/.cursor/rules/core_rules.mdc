@@ -49,3 +49,10 @@ alwaysApply: true
    - Reports MUST be generated even if: task failed, only one agent used, direct tools used, no code changes made, or just an answer to a question
    - This ensures complete traceability, accountability, and audit trail for ALL activities
    - Violation is a CRITICAL SYSTEM ERROR
+   
+   ### Rule 0.7: MANDATORY English Language for All Documentation and Reports
+   - ALL documentation, reports, comments, and written content MUST be in English
+   - This includes: code comments, documentation files, reports, markdown files, README files, user stories, and any other written content
+   - NO exceptions - even if user asks in another language, the output MUST be in English
+   - User queries can be in any language, but ALL responses, documentation, and reports MUST be in English
+   - Violation is a CRITICAL SYSTEM ERROR
