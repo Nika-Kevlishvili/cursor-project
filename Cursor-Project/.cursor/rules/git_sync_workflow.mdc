@@ -1,5 +1,5 @@
 ---
-description: Standalone Git sync workflow rule with readonly token. Apply when user requests to fetch projects, update branches (dev, dev2, dev-fix, test), or checkout branches using trigger keywords `!sync`, `!update`, or `!checkout <branch>`. Handles stash/unstash of local changes automatically. Uses readonly Personal Access Token for authentication. Supports all Phoenix projects in Phoenix/ directory. IMPORTANT: This rule performs LOCAL operations only (fetch, checkout, local merge) - NO push, commit, or remote modifications. Fully compatible with safety rules. Supports both PowerShell (Windows) and Bash (Git Bash/Linux/macOS) - automatically detects shell environment.
+description: Standalone Git sync workflow rule with readonly token. Apply when user requests to fetch projects, update branches (dev, dev2, dev-fix, test), or checkout branches using trigger keywords `!sync`, `!update`, or `!checkout <branch>`. Handles stash/unstash of local changes automatically. Uses readonly Personal Access Token for authentication. Supports all Phoenix projects in Phoenix/ directory. IMPORTANT: This rule performs LOCAL operations only (fetch, checkout, local merge) - NO push, commit, or remote modifications. Fully compatible with safety rules. Supports both PowerShell (Windows) and Bash (Git Bash/Linux/macOS) - automatically detects shell environment. **NEW:** Automatically clones Phoenix projects if they don't exist (first-time setup).
 alwaysApply: false
 ---
 
@@ -146,18 +146,35 @@ GIT_READONLY_TOKEN="glpat-s3G3rmuJUPbsJBns039NRG86MQp1OjNzCA.01.0y0s67eqg"
 
 **Trigger:** `!sync` (without branch specification)
 
-**Action:** Fetch all available projects from remote repositories using readonly token
+**Action:** 
+- **If Phoenix projects don't exist:** Clone all Phoenix projects from GitLab first
+- **If Phoenix projects exist:** Fetch all available projects from remote repositories using readonly token
 
 **Process:**
 1. **Detect Workspace Root**
    - Use `$WORKSPACE_ROOT` if set, otherwise use current directory or detect from git repos
    - Navigate to workspace root
 
-2. **Discover Phoenix Projects**
+2. **Check if Phoenix Projects Exist**
+   - **If `Phoenix/` directory doesn't exist or is empty:** Clone all Phoenix projects first
+   - **If `Phoenix/` exists but has no Git repositories:** Clone all Phoenix projects first
+   - **List of Phoenix projects to clone:**
+     - `phoenix-core-lib` (https://git.domain.internal/phoenix/phoenix-core-lib.git)
+     - `phoenix-core` (https://git.domain.internal/phoenix/phoenix-core.git)
+     - `phoenix-billing-run` (https://git.domain.internal/phoenix/phoenix-billing-run.git)
+     - `phoenix-api-gateway` (https://git.domain.internal/phoenix/phoenix-api-gateway.git)
+     - `phoenix-payment-api` (https://git.domain.internal/phoenix/phoenix-payment-api.git)
+     - `phoenix-migration` (https://git.domain.internal/phoenix/phoenix-migration.git)
+     - `phoenix-ui` (https://git.domain.internal/phoenix/phoenix-ui.git)
+     - And other Phoenix projects as they exist
+   - **Clone process:** For each project, use `git clone` with readonly token authentication
+   - **After cloning:** Continue with fetch process
+
+3. **Discover Phoenix Projects**
    - Scan `Phoenix/` directory for all Git repositories
    - For each directory in `Phoenix/` that contains a `.git` folder, add it to the list
 
-3. **Check for Uncommitted Changes**
+4. **Check for Uncommitted Changes**
    - Check all discovered Phoenix repositories
    - Use `git status --porcelain` to detect uncommitted changes
    - **If uncommitted changes found:** Automatically stash them before fetch
@@ -167,13 +184,13 @@ GIT_READONLY_TOKEN="glpat-s3G3rmuJUPbsJBns039NRG86MQp1OjNzCA.01.0y0s67eqg"
    - Set up git to use the readonly token for authentication
    - Configure credential helper or embed token in remote URL
 
-5. **Fetch All Projects**
+6. **Fetch All Projects**
    - For each repository in `Phoenix/`:
      - Navigate to repository directory (relative path: `Phoenix/<repo-name>/`)
      - `git fetch origin --all` (fetch all branches and tags)
      - `git fetch origin --prune` (remove deleted remote branches)
 
-6. **Unstash Changes**
+7. **Unstash Changes**
    - **After successful fetch:** Automatically unstash: `git stash pop`
    - Report: "All projects fetched successfully."
 
@@ -224,6 +241,44 @@ if ($env:GIT_READONLY_TOKEN) {
         "https://oauth2:$($env:GIT_READONLY_TOKEN)@$GIT_HOST" | Out-File -FilePath $CREDENTIALS_FILE -Encoding ASCII -NoNewline
     }
 }
+
+# List of Phoenix projects to clone if they don't exist
+$PHOENIX_PROJECTS = @(
+    "phoenix-core-lib",
+    "phoenix-core",
+    "phoenix-billing-run",
+    "phoenix-api-gateway",
+    "phoenix-payment-api",
+    "phoenix-migration",
+    "phoenix-ui"
+)
+
+# Create Phoenix directory if it doesn't exist
+if (-not (Test-Path "Phoenix")) {
+    New-Item -ItemType Directory -Path "Phoenix" | Out-Null
+    Write-Host "Created Phoenix directory"
+}
+
+# Clone missing projects if Phoenix directory is empty or projects don't exist
+Push-Location "Phoenix"
+$existingRepos = Get-ChildItem -Directory | Where-Object { Test-Path (Join-Path $_.FullName ".git") }
+if ($existingRepos.Count -eq 0) {
+    Write-Host "No Phoenix projects found. Cloning projects from GitLab..."
+    foreach ($project in $PHOENIX_PROJECTS) {
+        $projectPath = Join-Path (Get-Location).Path $project
+        if (-not (Test-Path $projectPath)) {
+            Write-Host "Cloning: $project"
+            $repoUrl = "https://oauth2:$($env:GIT_READONLY_TOKEN)@git.domain.internal/phoenix/$project.git"
+            git clone $repoUrl $project 2>&1 | Out-Null
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "  ✅ Cloned $project"
+            } else {
+                Write-Host "  ⚠️ Failed to clone $project (may not exist or token insufficient)"
+            }
+        }
+    }
+}
+Pop-Location
 
 # Discover and process all Phoenix projects
 if (Test-Path "Phoenix") {
@@ -301,6 +356,42 @@ if [ -n "$GIT_READONLY_TOKEN" ]; then
         echo "https://oauth2:${GIT_READONLY_TOKEN}@${GIT_HOST}" > "$CREDENTIALS_FILE"
     fi
 fi
+
+# List of Phoenix projects to clone if they don't exist
+PHOENIX_PROJECTS=(
+    "phoenix-core-lib"
+    "phoenix-core"
+    "phoenix-billing-run"
+    "phoenix-api-gateway"
+    "phoenix-payment-api"
+    "phoenix-migration"
+    "phoenix-ui"
+)
+
+# Create Phoenix directory if it doesn't exist
+if [ ! -d "Phoenix" ]; then
+    mkdir -p Phoenix
+    echo "Created Phoenix directory"
+fi
+
+# Clone missing projects if Phoenix directory is empty or projects don't exist
+cd Phoenix
+EXISTING_REPOS=$(find . -maxdepth 1 -type d -name ".*" -prune -o -type d -exec test -d {}/.git \; -print | wc -l)
+if [ "$EXISTING_REPOS" -eq 0 ]; then
+    echo "No Phoenix projects found. Cloning projects from GitLab..."
+    for project in "${PHOENIX_PROJECTS[@]}"; do
+        if [ ! -d "$project" ]; then
+            echo "Cloning: $project"
+            REPO_URL="https://oauth2:${GIT_READONLY_TOKEN}@git.domain.internal/phoenix/${project}.git"
+            if git clone "$REPO_URL" "$project" 2>/dev/null; then
+                echo "  ✅ Cloned $project"
+            else
+                echo "  ⚠️ Failed to clone $project (may not exist or token insufficient)"
+            fi
+        fi
+    done
+fi
+cd ..
 
 # Discover and process all Phoenix projects
 if [ -d "Phoenix" ]; then
