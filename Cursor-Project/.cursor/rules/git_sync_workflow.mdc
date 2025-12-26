@@ -1,8 +1,6 @@
 ---
-description: Standalone Git sync workflow rule with readonly token. Apply when user requests to fetch projects, update branches (dev, dev2, dev-fix, test), or checkout branches using trigger keywords `!sync`, `!update`, or `!checkout <branch>`. Handles stash/unstash of local changes automatically. Uses readonly Personal Access Token for authentication. Supports all Phoenix projects in Phoenix/ directory. IMPORTANT: This rule performs LOCAL operations only (fetch, checkout, local merge) - NO push, commit, or remote modifications. Fully compatible with safety rules. Supports both PowerShell (Windows) and Bash (Git Bash/Linux/macOS) - automatically detects shell environment. **NEW:** Automatically clones Phoenix projects if they don't exist (first-time setup).
-alwaysApply: false
+alwaysApply: true
 ---
-
 # Git Sync Workflow Rule (Standalone with Readonly Token)
 
 ## ⚠️ CRITICAL: Configure Your Token
